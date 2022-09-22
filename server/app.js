@@ -1,4 +1,5 @@
 const express = require('express');
+const upload = require('express-fileupload');
 
 const app = express();
 require('dotenv').config();
@@ -13,7 +14,7 @@ app.use(
     credentials: true,
   }),
 );
-
+app.use(upload());
 app.use(express.json());
 
 app.use('/', authRoute);

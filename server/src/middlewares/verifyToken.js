@@ -10,8 +10,9 @@ function verify(req, res, next) {
     } catch (error) {
       res.status(400).send('Invalid Token');
     }
+  } else {
+    res.status(401).send('Access Denied');
   }
-  return res.status(401).send('Access Denied');
 }
 
 module.exports = verify;
