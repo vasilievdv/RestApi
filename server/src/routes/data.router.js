@@ -85,4 +85,19 @@ router.get('/:id', verify, async (req, res) => {
   }
 });
 
+router.get('/download/:id', verify, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  try {
+    const checkId = await File.findOne({ where: { id } });
+    if (userId === checkId.user_id) {
+      const file = `./uploads/${checkId.name}`;
+      res.download(file);
+    } else {
+      res.send('Not your file');
+    }
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
 module.exports = router;
