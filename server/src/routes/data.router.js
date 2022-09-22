@@ -133,4 +133,5 @@ router.put('/update/:id', verify, async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
 module.exports = router;
