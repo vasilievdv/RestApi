@@ -22,7 +22,7 @@ router.post('/signup', async (req, res) => {
   return res.sendStatus(400);
 });
 
-const refreshTokens = [];
+let refreshTokens = [];
 
 router.post('/signin', async (req, res) => {
   const { userId } = req.body;
@@ -105,6 +105,15 @@ router.post('/signin/new_token', async (req, res) => {
       ],
     });
   }
+});
+
+router.delete('/logout', (req, res) => {
+  const refreshToken = req.header('x-auth-token');
+  if (refreshToken) {
+    refreshTokens = refreshTokens.filter((tok) => tok !== refreshToken);
+    return res.sendStatus(200);
+  }
+  return res.sendStatus(204);
 });
 
 module.exports = router;
