@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const mime = require('mime-types');
+const fs = require('fs').promises;
 const verify = require('../middlewares/verifyToken');
 const { File } = require('../../db/models');
 
@@ -43,10 +44,25 @@ router.get('/list', verify, async (req, res) => {
   const offset = +((page - 1) * list_size);
   // eslint-disable-next-line camelcase
   const limit = +list_size;
-  console.log(offset, limit);
   try {
     const userFiles = await File.findAll({ where: { user_id: id }, offset, limit });
     res.send(userFiles);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+router.delete('/delete/:id', verify, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  try {
+    const checkId = await File.findOne({ where: { id } });
+    if (userId === checkId.user_id) {
+      await File.destroy({ where: { id } });
+      const filePath = `./uploads/${checkId.name}`;
+      fs.unlink(filePath);
+      res.send('Done');
+    }
   } catch (error) {
     res.status(400).send(error.message);
   }
