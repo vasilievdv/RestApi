@@ -100,4 +100,37 @@ router.get('/download/:id', verify, async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+router.put('/update/:id', verify, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  try {
+    const checkId = await File.findOne({ where: { id } });
+    if (userId === checkId.user_id && req.files) {
+      const { name, mimetype, size } = req.files.file;
+      const { file } = req.files;
+      const type = mime.extension(mimetype);
+      const uniqueName = `${new Date().toISOString()}-${name}`;
+      const filePath = `./uploads/${checkId.name}`;
+      await File.update(
+        {
+          user_id: userId, name: uniqueName, mimetype, size, type,
+        },
+        { where: { id } },
+      );
+      fs.unlink(filePath);
+      file.mv(`./uploads/${uniqueName}`, (err) => {
+        if (err) {
+          res.send(err);
+        } else {
+          res.send('File Updated');
+        }
+      });
+    } else {
+      res.send('Not your file');
+    }
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
 module.exports = router;
