@@ -16,7 +16,7 @@ app.use(
 
 app.use(express.json());
 
-app.use('/api/user', authRoute);
-app.use('/api/data', postRoute);
+app.use('/', authRoute);
+app.use('/file', postRoute);
 
 app.listen(process.env.PORT, () => { console.log(`Server Up and running on PORT ${process.env.PORT}`); });
