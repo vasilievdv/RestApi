@@ -6,4 +6,6 @@ cd server/
 
 npm i
 
+npm start
+
 Все запросы выполнялись с Postman.
