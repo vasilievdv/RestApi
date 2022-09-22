@@ -51,13 +51,60 @@ router.post('/signin', async (req, res) => {
           token,
           refreshToken,
         });
+      } else {
+        res.sendStatus(401);
       }
-      return res.sendStatus(401);
     } catch (error) {
-      return res.sendStatus(500);
+      res.sendStatus(500);
     }
+  } else {
+    res.sendStatus(400);
   }
-  return res.sendStatus(400);
+});
+
+router.post('/signin/new_token', async (req, res) => {
+  const refreshToken = req.header('x-auth-token');
+  if (!refreshToken) {
+    res.status(401).json({
+      errors: [
+        {
+          msg: 'Token not found',
+        },
+      ],
+    });
+  }
+
+  if (!refreshTokens.includes(refreshToken)) {
+    res.status(403).json({
+      errors: [
+        {
+          msg: 'Invalid refresh token',
+        },
+      ],
+    });
+  }
+
+  try {
+    const user = await jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+    );
+    const { id } = user;
+    const accessToken = await jwt.sign(
+      { id },
+      process.env.TOKEN_SECRET,
+      { expiresIn: '10m' },
+    );
+    res.json({ accessToken });
+  } catch (err) {
+    res.status(403).json({
+      errors: [
+        {
+          msg: 'Invalid token',
+        },
+      ],
+    });
+  }
 });
 
 module.exports = router;
